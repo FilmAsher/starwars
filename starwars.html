@@ -1,0 +1,494 @@
+<html>
+<head>
+    <title>Star Wars WDC</title>
+    
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <script src="https://connectors.tableau.com/libs/tableauwdc-2.0.0-beta.js" type="text/javascript"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" type="text/javascript"></script>
+    <script>
+      (function(){
+        var myConnector = tableau.makeConnector();
+
+        myConnector.init = function(initCallback) {
+            tableau.log('running init function');
+            initCallback();
+            tableau.submit();
+        };
+
+        myConnector.getSchema = function (schemaCallback) {
+            tableau.log(tableau.phase);
+            var data_tables = [];
+            /****************************************
+            *           Dimension Tables
+            ****************************************/
+
+            // Films
+            var films_cols = [
+                {id : 'title', alias : 'Film Title', dataType : tableau.dataTypeEnum.string}
+              , {id : 'ep', alias : 'Episode', dataType : tableau.dataTypeEnum.int}
+              , {id : 'crawl', alias : 'Opening Crawl', dataType : tableau.dataTypeEnum.string}
+              , {id : 'director', alias : 'Director', dataType : tableau.dataTypeEnum.string}
+              , {id : 'producer', alias : 'Producer', dataType : tableau.dataTypeEnum.string}
+              , {id : 'release', alias : 'Release Date', dataType : tableau.dataTypeEnum.date}
+              , {id : 'id', alias : 'ID', dataType : tableau.dataTypeEnum.int}
+            ];
+
+            var film_table = {
+                id : "films",
+                alias : "Films",
+                columns : films_cols
+            };
+            data_tables.push(film_table);
+            // starships
+            var ship_cols = [
+                {id : "name", alias : 'Starship Name', dataType : tableau.dataTypeEnum.string}
+              , {id : "model", alias : 'Model', dataType : tableau.dataTypeEnum.string}
+              , {id : "make", alias : 'Manufacturer', dataType : tableau.dataTypeEnum.string}
+              , {id : "cost", alias : 'Cost in Credits (new)', dataType : tableau.dataTypeEnum.string}
+              , {id : "length", alias : 'Length', dataType : tableau.dataTypeEnum.string}
+              , {id : "speed_atmo", alias : 'Maximum Speed (in Atmosphere)', dataType : tableau.dataTypeEnum.string}
+              , {id : "crew", alias : 'Crew Size', dataType : tableau.dataTypeEnum.string}
+              , {id : "passengers", alias : 'Passenger Capacity', dataType : tableau.dataTypeEnum.string}
+              , {id : "cargo", alias : 'Cargo Capacity', dataType : tableau.dataTypeEnum.string}
+              , {id : "consumables", alias : 'Maximum Flight Duration (comsumables)', dataType : tableau.dataTypeEnum.string}
+              , {id : "hyper", alias : 'Hyperdrive Rating', dataType : tableau.dataTypeEnum.string}
+              , {id : "speed_mglt", alias : 'Megalights per Hour', dataType : tableau.dataTypeEnum.string}
+              , {id : "class", alias : 'Class', dataType : tableau.dataTypeEnum.string}
+              , {id : "id", alias : 'ID', dataType : tableau.dataTypeEnum.int}
+            ];
+
+            var ship_table = {
+                id : "ships",
+                alias : "Starships",
+                columns : ship_cols
+            };
+            data_tables.push(ship_table);
+            // people
+            var people_cols = [
+                {id : "name", alias : 'Full Name', dataType : tableau.dataTypeEnum.string}
+              , {id : "height", alias : 'Height', dataType : tableau.dataTypeEnum.string}
+              , {id : "mass", alias : 'Mass', dataType : tableau.dataTypeEnum.string}
+              , {id : "hair", alias : 'Hair Color', dataType : tableau.dataTypeEnum.string}
+              , {id : "skin", alias : 'Skin Color', dataType : tableau.dataTypeEnum.string}
+              , {id : "eye", alias : 'Eye Color', dataType : tableau.dataTypeEnum.string}
+              , {id : "birth", alias : 'Birth Year', dataType : tableau.dataTypeEnum.string}
+              , {id : "gender", alias : 'Gender', dataType : tableau.dataTypeEnum.string}
+              , {id : "homeworld", alias : 'Homeworld ID', dataType : tableau.dataTypeEnum.int}
+              , {id : 'species', alias : 'Species ID', dataType : tableau.dataTypeEnum.int}
+              , {id : "id", alias : 'ID', dataType : tableau.dataTypeEnum.int}
+            ];
+
+            var people_table = {
+                id: 'people',
+                alias : 'People',
+                columns : people_cols
+            };
+            data_tables.push(people_table);
+            //planets
+            var planet_cols = [
+                {id: "name", alias : 'Species Name', dataType : tableau.dataTypeEnum.string}
+              , {id: "day", alias : 'Rotation Period', dataType : tableau.dataTypeEnum.string}
+              , {id: "year", alias : 'Orbital Period', dataType : tableau.dataTypeEnum.string}
+              , {id: "diameter", alias : 'Diameter', dataType : tableau.dataTypeEnum.string}
+              , {id: "climate", alias : 'Climate', dataType : tableau.dataTypeEnum.string}
+              , {id: "grav", alias : 'Gravity', dataType : tableau.dataTypeEnum.string}
+              , {id: "terrain", alias : 'Terrain', dataType : tableau.dataTypeEnum.string}
+              , {id: "water", alias : 'Surface Water', dataType : tableau.dataTypeEnum.string}
+              , {id: "pop", alias : 'Population', dataType : tableau.dataTypeEnum.string}
+              , {id: "id", alias : 'ID', dataType : tableau.dataTypeEnum.int}
+            ];
+
+            var planets_table = {
+                id: 'planets',
+                alias : 'Planets',
+                columns : planet_cols
+            };
+            data_tables.push(planets_table);
+            //vehicles
+            var vehicle_cols = [
+                {id: "name", alias : 'Name', dataType : tableau.dataTypeEnum.string}
+              , {id: "model", alias : 'Model', dataType : tableau.dataTypeEnum.string}
+              , {id: "manufacturer", alias : 'Manufacturer', dataType : tableau.dataTypeEnum.string}
+              , {id: "cost", alias : 'Cost (in Credits)', dataType : tableau.dataTypeEnum.string}
+              , {id: "length", alias : 'Length', dataType : tableau.dataTypeEnum.string}
+              , {id: "speed", alias : 'Max Speed', dataType : tableau.dataTypeEnum.string}
+              , {id: "crew", alias : 'Crew', dataType : tableau.dataTypeEnum.string}
+              , {id: "passengers", alias : 'Passenger Capacity', dataType : tableau.dataTypeEnum.string}
+              , {id: "cargo", alias : 'Cargo Capacity', dataType : tableau.dataTypeEnum.string}
+              , {id: "consumables", alias : 'Consumables', dataType : tableau.dataTypeEnum.string}
+              , {id: "class", alias : 'Class', dataType : tableau.dataTypeEnum.string}
+              , {id: "id", alias : 'ID', dataType : tableau.dataTypeEnum.int}
+            ];
+
+            var vehicles_table = {
+                id: 'vehicles',
+                alias: 'Vehicles',
+                columns: vehicle_cols
+            };
+            data_tables.push(vehicles_table);
+            //species
+            var species_cols = [
+                {id: "name", alias : 'Species Name', dataType : tableau.dataTypeEnum.string}
+              , {id: "class", alias : 'Classification', dataType : tableau.dataTypeEnum.string}
+              , {id: "des", alias : 'Designation', dataType : tableau.dataTypeEnum.string}
+              , {id: "height", alias : 'Average Height', dataType : tableau.dataTypeEnum.string}
+              , {id: "skin", alias : 'Skin Colors', dataType : tableau.dataTypeEnum.string}
+              , {id: "hair", alias : 'Hair Colors', dataType : tableau.dataTypeEnum.string}
+              , {id: "eye", alias : 'Eye Colors', dataType : tableau.dataTypeEnum.string}
+              , {id: "life", alias : 'Average Lifespan', dataType : tableau.dataTypeEnum.string}
+              , {id: "home", alias : 'Homeworld ID', dataType : tableau.dataTypeEnum.string}
+              , {id: "lang", alias : 'Language', dataType : tableau.dataTypeEnum.string}
+              , {id: "id", alias : 'ID', dataType : tableau.dataTypeEnum.int}
+            ];
+
+            var species_table = {
+                id: 'species',
+                alias: 'Species',
+                columns: species_cols
+            }
+            data_tables.push(species_table);
+
+            /****************************************
+            *           Fact Tables
+            ****************************************/
+
+            //cast of charcters (films-people)
+            var cast_cols = [
+                {id: 'person', alias: 'PersonID', dataType : tableau.dataTypeEnum.int}
+              , {id: 'film', alias: 'FilmID', dataType : tableau.dataTypeEnum.int}
+            ];
+
+            var cast_table = {
+                id: 'cast',
+                alias: 'Cast of Characters',
+                columns: cast_cols
+            };
+            data_tables.push(cast_table);
+
+            //locations (films-planets)
+            var loc_cols = [
+                {id: 'location', alias: 'PlanetID', dataType : tableau.dataTypeEnum.int}
+              , {id: 'film', alias: 'FilmID', dataType : tableau.dataTypeEnum.int}
+            ];
+
+            var location_table = {
+                id: 'locations',
+                alias: 'Film Locations (planets)',
+                columns: loc_cols
+            };
+            data_tables.push(location_table);
+
+            // veh_props (films-vehicles)
+            var veh_props_cols = [
+                {id: 'vehicle', alias: 'VehicleID', dataType : tableau.dataTypeEnum.int}
+              , {id: 'film', alias: 'FilmID', dataType : tableau.dataTypeEnum.int}
+            ];
+
+            var veh_props_table = {
+                id: 'veh_props',
+                alias: 'Film Vehicle Props',
+                columns: veh_props_cols
+            };
+            data_tables.push(veh_props_table);
+
+            // star_props (films-starships)
+            var ship_props_cols = [
+                {id: 'ship', alias: 'StarshipID', dataType : tableau.dataTypeEnum.int}
+              , {id: 'film', alias: 'FilmID', dataType : tableau.dataTypeEnum.int}
+            ];
+
+            var ship_props_table = {
+                id: 'ship_props',
+                alias: 'Film Starship Props',
+                columns: ship_props_cols
+            };
+            data_tables.push(ship_props_table);
+
+            // Pilots (people-starships)
+            var pilot_cols = [
+                {id: 'ship', alias: 'StarshipID', dataType : tableau.dataTypeEnum.int}
+              , {id: 'person', alias: 'PersonID', dataType : tableau.dataTypeEnum.int}
+            ];
+
+            var pilot_table = {
+                id: 'pilots',
+                alias: 'Film Starship Pilots',
+                columns: pilot_cols
+            };
+            data_tables.push(pilot_table);
+
+            // Drivers (people-vehicles)
+            var driver_cols = [
+                {id: 'vehicle', alias: 'VehicleID', dataType : tableau.dataTypeEnum.int}
+              , {id: 'person', alias: 'PersonID', dataType : tableau.dataTypeEnum.int}
+            ];
+
+            var driver_table = {
+                id: 'drivers',
+                alias: 'Film Vehicle Drivers',
+                columns: driver_cols
+            };
+            data_tables.push(driver_table);
+
+
+            // callback
+            schemaCallback(data_tables);
+        };
+     
+        myConnector.getData = function (table, doneCallback) {
+            //console.log(table);
+            tableau.log(tableau.phase + '\t: Fetching Table - ' + table.tableInfo.id);
+            switch(table.tableInfo.id) {
+                case 'films' :
+                    var url = 'http://swapi.co/api/films/';
+                    requestData(url, table, doneCallback);
+                break;
+                case 'ships' :
+                    var url = 'http://swapi.co/api/starships/';
+                    requestData(url, table, doneCallback);
+                break;
+                case 'people' :
+                    var url = 'http://swapi.co/api/people/';
+                    requestData(url, table, doneCallback);
+                break;
+                case 'species' :
+                    var url = 'http://swapi.co/api/species/';
+                    requestData(url, table, doneCallback);
+                break;
+                case 'planets' :                    
+                    var url = 'http://swapi.co/api/planets/';
+                    requestData(url, table, doneCallback);
+                break;
+                case 'vehicles' :
+                    var url = 'http://swapi.co/api/vehicles/';
+                    requestData(url, table, doneCallback);
+                break;
+                case 'cast' :
+                    var url = 'http://swapi.co/api/films/';
+                    requestData(url, table, doneCallback);
+                break;
+                case 'locations' :
+                    var url = 'http://swapi.co/api/films/';
+                    requestData(url, table, doneCallback);
+                break;
+                case 'veh_props' :
+                    var url = 'http://swapi.co/api/films/';
+                    requestData(url, table, doneCallback);
+                break;
+                case 'ship_props' :
+                    var url = 'http://swapi.co/api/films/';
+                    requestData(url, table, doneCallback);
+                break;
+                case 'drivers' :
+                    var url = 'http://swapi.co/api/people/';
+                    requestData(url, table, doneCallback);
+                break;
+                case 'pilots' :
+                    var url = 'http://swapi.co/api/people/';
+                    requestData(url, table, doneCallback);
+                break;
+                //more cases here
+                default :
+                    tableau.log('Default Case, No Valid Table Found.');
+                    tableau.abortWithError("TableInfo id mismatch");
+                    break;
+            }
+        }
+        
+     
+        
+
+        function get_ID(url) {
+            console.log('Parseing for ID: ' + url);
+            return parseInt(url.split('/')[5], 10);
+        }
+        function requestData(url, table, doneCallback) {
+            var xhr = $.ajax({
+                url: url,
+                dataType: 'json',
+                success: function (response) {
+                    var results = response.results;
+                    tableau.log(results);
+                    var data = [];
+                    for (var i = 0; i < results.length; i++) {
+                        var datum = results[i];
+                        tableau.log(datum);                        
+                        var record = getRecord(datum, table);
+                        tableau.log(record);
+                        if (record.length && record.length > 0) {
+                            for (var j = 0; j < record.length; j++) {
+                                data.push(record[j]);
+                            } 
+                        } else {
+                            data.push(record);      
+                        }     
+                    }
+                    table.appendRows(data);
+                    tableau.log(response.next);
+                    if (response.next) {
+                        requestData(response.next, table, doneCallback);
+                    } else {
+                        doneCallback();
+                    }
+                }, 
+                error: function (xhr, ajaxOptions, thrownError) {
+                    tableau.log("Connection error: " + xhr.responseText + "\n" + thrownError);
+                    tableau.abortWithError("Error while trying to connect to the star wars api data source." + xhr.responseText + "\n" + thrownError);
+                }
+            });
+        }
+        function getRecord(data, table) {
+            switch (table.tableInfo.id) {
+                case 'films' :
+                    return {  'title' : data.title
+                            , 'ep' : data.episode_id
+                            , 'crawl' : data.opening_crawl
+                            , 'director' : data.director
+                            , 'producer' : data.producer
+                            , 'release' : Date.parse(data.release_date)
+                            , 'id' : get_ID(data.url)
+                        };
+                break;
+                case 'ships' :
+                    return {  'name' : data.name
+                            , 'model' : data.model
+                            , 'make' : data.manufacturer
+                            , 'cost' : data.cost_in_credits
+                            , "length" : data.length
+                            , "speed_atmo" : data.max_atmosphering_speed
+                            , "crew" : data.crew
+                            , "passengers" : data.passengers
+                            , "cargo" : data.cargo_capacity
+                            , "consumables" : data.consumables
+                            , "hyper" : data.hyperdrive_rating
+                            , "speed_mglt" : data.MGLT
+                            , "class" : data.starship_class
+                            , "id" : get_ID(data.url)
+                        };
+                break;
+                case 'people' :
+                    return {  'name' : data.name
+                            , 'height' : data.height
+                            , 'mass' : data.mass
+                            , 'hair' : data.hair_color
+                            , 'skin' : data.skin_color
+                            , 'eye' : data.eye_color
+                            , 'birth' : data.birth_year
+                            , 'gender' : data.gender
+                            , 'homeworld' : get_ID(data.homeworld)
+                            , 'species' : data.species.length > 0 ? get_ID(data.species[0]) : null
+                            , "id" : get_ID(data.url)
+                        };
+                break;
+                case 'species' :
+                    return {  'name' : data.name
+                            , 'class' : data.classification
+                            , 'des' : data.designation
+                            , 'height' : data.average_height
+                            , 'skin' : data.skin_colors
+                            , 'hair' : data.hair_colors
+                            , 'eye' : data.eye_colors
+                            , 'life' : data.average_lifespan
+                            , 'home' : data.homeworld
+                            , 'language' : data.language
+                            , "id" : get_ID(data.url)
+                        };
+                break;
+                case 'planets' :                    
+                    return {  'name' : data.name
+                            , 'dat' : data.rotation_period
+                            , 'year' : data.orbital_period
+                            , 'diameter' : data.diameter
+                            , 'climate' : data.climate
+                            , 'grav' : data.gravity
+                            , 'terrain' : data.terrain
+                            , 'water' : data.surface_water
+                            , 'pop' : data.population
+                            , "id" : get_ID(data.url)
+                        };
+                break;
+                case 'vehicles' :
+                    return {  'name' : data.name
+                            , 'model' : data.model
+                            , 'manufacturer' : data.manufacturer
+                            , 'cost' : data.cost_in_credits
+                            , 'length' : data.length
+                            , 'speed' : data.max_atmosphering_speed
+                            , 'crew' : data.crew
+                            , 'passengers' : data.passengers
+                            , 'cargo' : data.cargo_capacity
+                            , 'consumables' : data.consumables
+                            , 'class' : data.vehicle_class
+                            , "id" : get_ID(data.url)
+                        };
+                break;
+                case 'cast' :
+                    var return_data = [];
+                    for (var i = 0; i < data.characters.length; i++) {
+                        return_data.push({
+                            'person' : get_ID(data.characters[i])
+                          , 'film' : get_ID(data.url)
+                        });
+                    }
+                    return return_data;
+                break;
+                case 'locations' :
+                    var return_data = [];
+                    for (var i = 0; i < data.planets.length; i++) {
+                        return_data.push({
+                            'location' : get_ID(data.planets[i])
+                          , 'film' : get_ID(data.url)
+                        });
+                    }
+                    return return_data;
+                break;
+                case 'veh_props' :
+                    var return_data = [];
+                    for (var i = 0; i < data.vehicles.length; i++) {
+                        return_data.push({
+                            'vehicle' : get_ID(data.vehicles[i])
+                          , 'film' : get_ID(data.url)
+                        });
+                    }
+                    return return_data;
+                break;
+                case 'ship_props' :
+                    var return_data = [];
+                    for (var i = 0; i < data.starships.length; i++) {
+                        return_data.push({
+                            'ship' : get_ID(data.starships[i])
+                          , 'film' : get_ID(data.url)
+                        });
+                    }
+                    return return_data;
+                break;
+                case 'drivers' :
+                    var return_data = [];
+                    for (var i = 0; i < data.vehicles.length; i++) {
+                        return_data.push({
+                            'vehicle' : get_ID(data.vehicles[i])
+                          , 'person' : get_ID(data.url)
+                        });
+                    }
+                    return return_data;
+                break;
+                case 'pilots' :
+                    var return_data = [];
+                    for (var i = 0; i < data.starships.length; i++) {
+                        return_data.push({
+                            'ship' : get_ID(data.starships[i])
+                          , 'person' : get_ID(data.url)
+                        });
+                    }
+                    return return_data;
+                break;
+            }
+        }
+
+        tableau.registerConnector(myConnector);
+      })();
+    </script>
+</head>
+<body>
+</body>
+</html>
